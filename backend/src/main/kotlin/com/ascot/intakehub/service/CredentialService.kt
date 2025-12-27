@@ -53,7 +53,8 @@ class CredentialService(
             .map { cred ->
                 val encrypted = String(cred.encryptedData)
                 val json = encryptionUtil.decrypt(encrypted)
-                com.fasterxml.jackson.module.kotlin.jacksonObjectMapper().readValue(json, Map::class.java) as Map<String, String>
+                val typeRef = object : com.fasterxml.jackson.core.type.TypeReference<Map<String, String>>() {}
+                com.fasterxml.jackson.module.kotlin.jacksonObjectMapper().readValue(json, typeRef)
             }
     }
 }
