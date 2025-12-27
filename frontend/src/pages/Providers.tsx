@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
+import type { Provider } from '../store/useStore';
 
 export const Providers: React.FC = () => {
     const { providers, fetchProviders, createProvider, saveCredentials } = useStore();
@@ -59,7 +60,7 @@ export const Providers: React.FC = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded w-96">
                         <h3 className="font-bold mb-2">Update Credentials</h3>
-                        <p className="text-xs text-gray-500 mb-2">Enter credentials as JSON (e.g. {"username": "foo"})</p>
+                        <p className="text-xs text-gray-500 mb-2">Enter credentials as JSON (e.g. {'{"username": "foo"}'})</p>
                         <textarea
                             className="w-full border p-2 h-32"
                             onChange={e => setFormData({ ...formData, credsJson: e.target.value })}
@@ -82,7 +83,7 @@ export const Providers: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {providers.map(p => (
+                        {providers.map((p: Provider) => (
                             <tr key={p.id} className="border-t">
                                 <td className="p-3">{p.name}</td>
                                 <td className="p-3">{p.authType}</td>

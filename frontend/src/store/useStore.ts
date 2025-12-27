@@ -1,13 +1,16 @@
 import { create } from 'zustand';
 import { client } from '../api/client';
 
-interface Provider {
+export interface Provider {
     id: string; // UUID
     name: string;
     baseUrl: string;
     authType: string;
     enabled: boolean;
     priority: number;
+    rateLimitRequests?: number;
+    rateLimitWindowSeconds?: number;
+    cloudflareTunnel?: boolean;
 }
 
 interface AppState {
@@ -36,18 +39,18 @@ export const useStore = create<AppState>((set) => ({
         }
     },
 
-    createProvider: async (provider) => {
+    createProvider: async (provider: Omit<Provider, 'id'>) => {
         await client.post('/providers', provider);
         // Refresh
         const state = useStore.getState();
         await state.fetchProviders();
     },
 
-    saveCredentials: async (providerId, data) => {
+    saveCredentials: async (providerId: string, data: Record<string, string>) => {
         await client.post(`/credentials/${providerId}`, data);
     },
 
-    triggerIntake: async (providerName) => {
+    triggerIntake: async (providerName?: string) => {
         await client.post('/data/intake', null, {
             params: { provider: providerName }
         });
