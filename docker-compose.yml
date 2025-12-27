@@ -1,0 +1,64 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=intakehub
+      - DB_USER=intakehub_user
+      - DB_PASSWORD=secure_password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=very_secret_key_needs_to_be_long_for_hs512_verification_defaults
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY} # Fernet key from host env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - intakehub-net
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - intakehub-net
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=intakehub
+      - POSTGRES_USER=intakehub_user
+      - POSTGRES_PASSWORD=secure_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U intakehub_user -d intakehub" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - intakehub-net
+
+  redis:
+    image: redis:alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - intakehub-net
+
+networks:
+  intakehub-net:
+    driver: bridge
+
+volumes:
+  postgres-data:

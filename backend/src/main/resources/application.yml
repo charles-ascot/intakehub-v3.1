@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: intakehub
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:intakehub}
+    username: ${DB_USER:intakehub_user}
+    password: ${DB_PASSWORD:secure_password}
+    pool:
+      initial-size: 5
+      max-size: 20
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:intakehub}
+    user: ${DB_USER:intakehub_user}
+    password: ${DB_PASSWORD:secure_password}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:very_secret_key_needs_to_be_long_for_hs512_verification_defaults}
+    expiration: 86400000 # 24 hours
+  fernet:
+    key: ${ENCRYPTION_KEY:} # Must be set in env
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.ascot.intakehub: DEBUG
